@@ -9,4 +9,7 @@
 
 ## Daily Logs<a name="logs"></a>
 ### 09/03/2019
-* New repo 
+* New repo created.
+
+### 09/04/2019
+* Added R Notebook file ***test.Rmd*** as an example.
