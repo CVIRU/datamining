@@ -1,2 +1,12 @@
-# datamining
-Data mining class, Prof. Cabrera.
+##  Project: Data Mining Class
+### Scientist: Your Name
+### Created: 09/03/2019
+
+---    
+
+## Table of Contents
+[Daily Logs](#logs)  
+
+## Daily Logs<a name="logs"></a>
+### 09/03/2019
+* New repo 
