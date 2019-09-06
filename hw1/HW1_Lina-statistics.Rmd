@@ -1,0 +1,67 @@
+---
+title: "Github practice"
+output: 
+  html_notebook:
+    toc:true
+---
+
+step1: simulate data for the mouse experiment (10 samples/group, 6 groups totally)
+```{r setup}
+require(data.table)
+require(ggplot2)
+require(plotly)
+require(DT)
+
+N <- 10 # number of animals per group
+n_trt <- 6  # number of treatment groups
+```
+
+
+```{r data_sim}
+dt1 <- data.table(Groups = rep(c("NA",#naive
+                                 "DI",#disease
+                                 "NP",#naive placebo
+                                 "DP",#disease placebo
+                                 "NT",#naive treatment
+                                 "DT"),#disease treatment
+                               each = N),
+                  ID = paste0("ID",
+                              1:(N*n_trt)), Scores = rnorm(60,0,1))
+datatable(dt1,
+          rownames = FALSE)
+```
+
+
+```{r}
+dt1[c(1:10),]$Scores <- rnorm(10, 1, 0.2)
+dt1[c(21:30),]$Scores <- rnorm(10, 1, 0.2)
+dt1[c(41:50),]$Scores <- rnorm(10, 1, 0.2)
+dt1[c(11:20),]$Scores <- rnorm(10,10,0.7)
+dt1[c(31:40),]$Scores <- rnorm(10,10,0.7)
+dt1[51:60,]$Scores <- rnorm (10, 5, 0.5)
+datatable(dt1)
+```
+
+step2: data visualization
+```{r plot}
+p1 <- ggplot(data = dt1,
+             aes(x = Groups,
+                 y = Scores,
+                 col = ID)) +
+  geom_point(shape = 21,
+             size = 2,
+             position = position_dodge(0.3))
+print(p1)
+ggplotly(p1)
+```
+
+```{r}
+require(ggridges)
+ggplot(data = dt1,
+             aes(x = Scores,y = Groups,
+                 col=Groups, fill=Groups)) + 
+  geom_density_ridges( aes(point_color = Groups, point_fill = Groups, point_shape = Groups),
+    alpha = .2, point_alpha = 1,jittered_points = TRUE)+
+  coord_flip()
+```
+
