@@ -1,7 +1,12 @@
+#packages installing section
 install.packages("data.table")
 library(data.table)
 install.packages("ggplot2")
 library(ggplot2)
+install.packages("plotly")
+library(plotly)
+install.packages("knitr")
+library(knitr)
 
 ---
 title: "Stefan Maciolek - Homework 1"
