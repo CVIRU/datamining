@@ -1,0 +1,53 @@
+install.packages("data.table")
+library(data.table)
+install.packages("ggplot2")
+library(ggplot2)
+
+---
+title: "Stefan Maciolek - Homework 1"
+output: 
+  html_notebook:
+    toc:true
+---
+
+```{r setup}
+require(data.table)
+require(ggplot2)
+require(plotly)
+require(DT)
+
+N <- 5 # number of animals per group
+n_trt <- 3 # number of treatment groups
+```
+
+# Data
+```{r data_sim}
+dt1 <- data.table(Groups = rep(c("Naive",
+                                 "Vehicle",
+                                 "Treatemt"),
+                               each = N),
+                  ID = paste0("ID",
+                              1:(N*n_trt)),
+                  #adding scores up here, unresovalable errors when adding scores below
+                  Score = c(rnorm(n = 5, mean = 0, sd = 1),
+                                rnorm(n = 5, mean = 5, sd = 1),
+                                rnorm(n = 5, mean = 3, sd = 1)))
+data.table(dt1,
+          rownames = FALSE) #there needed to be a . in the function name
+```
+
+
+
+```{r plot}
+p1 <- ggplot(data = dt1,
+             aes(x = Groups,
+                 y = Score,
+                 fill = ID)) +
+  geom_point(shape = 21,
+             size = 3,
+             position = position_dodge(0.3))
+print(p1)
+
+ggplotly(p1)
+```
+
