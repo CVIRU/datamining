@@ -32,6 +32,7 @@ datatable(dt1,
 
 # Add scores
 #### Naïve group have low inflammation scores, the Vehicle  - the highest, and the TreatmentA  - somewhere in between, the TreatmentB - lower than the TreatmentA, but higher than the Naïve, the TreatmentC - lower than the TreatmentB, but higher than the Naïve.
+
 ```{r add_vars}
 dt1$Score[1:5] <- rnorm(N, mean=0, sd=1)
 dt1$Score[6:10] <- rnorm(N, mean=1, sd=1)
