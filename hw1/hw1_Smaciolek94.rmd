@@ -1,4 +1,4 @@
-#packages installing section
+#packages installing section run first
 install.packages("data.table")
 library(data.table)
 install.packages("ggplot2")
@@ -22,21 +22,25 @@ require(plotly)
 require(DT)
 
 N <- 5 # number of animals per group
-n_trt <- 3 # number of treatment groups
+n_trt <- 5 # number of treatment groups
 ```
 
 # Data
 ```{r data_sim}
-dt1 <- data.table(Groups = rep(c("Naive",
+dt1 <- data.table(Group = rep(c("Naive",
                                  "Vehicle",
-                                 "Treatemt"),
+                                 "Treatment_1",
+                                 "Treatment_2",
+                                 "Treatment_3"),
                                each = N),
                   ID = paste0("ID",
                               1:(N*n_trt)),
                   #adding scores up here, unresovalable errors when adding scores below
-                  Score = c(rnorm(n = 5, mean = 0, sd = 1),
+                  Inflammation_Score = c(rnorm(n = 5, mean = 0, sd = 1),
                                 rnorm(n = 5, mean = 5, sd = 1),
-                                rnorm(n = 5, mean = 3, sd = 1)))
+                                rnorm(n = 5, mean = 3, sd = 1),
+                                rnorm(n = 5, mean = 2, sd = 1),
+                                rnorm(n = 5, mean = 4, sd = 1)))
 data.table(dt1,
           rownames = FALSE) #there needed to be a . in the function name
 ```
@@ -44,15 +48,21 @@ data.table(dt1,
 
 
 ```{r plot}
+#removing the legend, adding a title and subtitle
 p1 <- ggplot(data = dt1,
-             aes(x = Groups,
-                 y = Score,
+             aes(x = Group,
+                 y = Inflammation_Score, #I changed the names to make them more clear
                  fill = ID)) +
   geom_point(shape = 21,
              size = 3,
-             position = position_dodge(0.3))
+             position = position_dodge(0.3),show.legend = "false")
+
+p1 <- p1 + labs(title = "Inflammation Scores by Treatment Group",subtitle = "Naive received no inflmmatory agent or treatment. Vehicle received only inflammatory agent. \nTreatments 1, 2, and 3 received inflammatory agent and treatment")
 print(p1)
 
 ggplotly(p1)
+
+#adding a qqplot to check variance
+qqnorm(dt1$Inflammation_Score)
 ```
 
