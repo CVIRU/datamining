@@ -1,0 +1,54 @@
+---
+title: "R Notebook"
+output: 
+  html_notebook:
+    toc:true
+---
+
+```{r setup}
+require(data.table)
+require(ggplot2)
+require(plotly)
+require(DT)
+
+N <- 10 # number of animals per group
+n_trt <- 4 # number of treatment groups
+```
+
+# Data
+### we creat 4 groups of mice: Naive (healthy and untreated), Vehicle (sick and treated with inactive part of the drug), Treatment A (sick and treated with active drug A ) and Treatment B (sick and treated with active drug B).
+```{r data_sim}
+dt1 <- data.table(Groups = rep(c("Naive",
+                                 "Vehicle",
+                                 "Treatment A",
+                                 "Treatment B"),
+                               each = N),
+                  ID = paste0("ID",
+                              1:(N*n_trt)),Scores = rnorm(40,0,1))
+datatable(dt1,
+          rownames = FALSE)
+```
+
+# Add scores
+### Naive group have lowest inflammation score while the Vehicle have the highest inflammation score, group Treatment A and B are in between, but group Treatment A is higher than Treatment B.
+```{r add_vars}
+dt1$Score[1:10] <- rnorm(N,mean=2,sd=1)
+dt1$Score[11:20] <- rnorm(N,mean=10,sd=1)
+dt1$Score[21:30] <- rnorm(N,mean=5,sd=1)
+dt1$Score[31:40] <- rnorm(N,mean=7,sd=1)
+datatable(dt1)
+```
+
+```{r plot}
+p1 <- ggplot(data = dt1,
+             aes(x = Groups,
+                 y = Score,
+                 fill = ID)) +
+  geom_point(shape = 21,
+             size = 3,
+             position = position_dodge(0.3))
+print(p1)
+
+ggplotly(p1)
+```
+
