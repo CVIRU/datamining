@@ -1,0 +1,98 @@
+---
+title: "R Notebook"
+output: 
+  html_notebook:
+    toc:true
+---
+
+```{r setup, echo=FALSE, warning=FALSE, results='hide'}
+
+require(data.table)
+require(ggplot2)
+require(plotly)
+require(DT)
+library(truncnorm)
+library(drc)
+
+
+N <- 10 # number of animals per group
+n_trt <- 4 # number of treatment groups
+```
+# Data
+
+There are four treatment groups: Naive, Vehicle, Dose1, Dose2<br>
+Number of animals per group: 10<br>
+Dataset of 40 observations is initialized with Group name and ID<br>
+
+```{r data_sim, echo=FALSE, warning=FALSE, results='hide'}
+dt1 <- data.table(Groups = rep(c("Naive",
+                                 "Vehicle",
+                                 "Dose1",
+                                 "Dose2"),
+                               each = N),
+                  ID = paste0("ID",
+                              1:(N*n_trt)))
+datatable(dt1,
+          rownames = FALSE)
+```
+
+# Add scores
+
+(1) Dose response relationship analysis <br>
+(2) Dataset table with Groups, ID and Score by different groups assigned. <br>
+
+```{r add_vars, echo=FALSE, warning=FALSE}
+
+dose <- 1:2
+resp <- rtruncnorm(n = length(dose),a=0,b=1)
+
+sort_resp <-c(min(resp),max(resp))
+
+#sort_resp
+
+m <- drm(sort_resp ~ dose, fct = LL.5())
+
+summary(m)
+
+plot(m)
+
+
+dt1$Score <- ifelse(dt1$Groups=="Naive",rnorm(N, mean=1, sd=0.1), 
+                        ifelse(dt1$Groups=="Vehicle",rnorm(N,mean=0, sd=0.1), 
+                            ifelse(dt1$Groups=="Dose1",rnorm(N, mean=sort_resp[1], sd=0.1),
+                            ifelse(dt1$Groups=="Dose2",rnorm(N, mean=sort_resp[2], sd=0.1),99))))
+datatable(dt1)
+
+```
+# Plots analysis
+
+(1) ggplot of Scores of each ID by groups <br>
+(2) Advanced/interactive plot <br>
+(3) Density score distribution comparison by groups
+
+```{r plot, echo=FALSE, warning=FALSE}
+
+p1 <- ggplot(data = dt1,
+             aes(x = Groups,
+                 y = Score,
+                 fill = ID)) +
+  geom_point(shape = 21,
+             size = 3,
+             position = position_dodge(0.3))
+print(p1)
+
+
+ggplotly(p1)
+
+par(lwd=2) 
+library(sm) 
+attach(dt1)
+Gp.f <- factor(Groups, levels= c("Vehicle","Dose1", "Dose2","Naive"),               
+               labels = c("Vehicle","Dose1", "Dose2","Naive")) 
+sm.density.compare(Score,Gp.f,xlab="Score")  
+title(main="Score Distribution by Groups")
+colfill<-c(2:(1+length(levels(Gp.f)))) 
+legend("topleft",legend =c("Vehicle","Dose1", "Dose2","Naive"), fill=colfill )
+detach(dt1) 
+```
+
