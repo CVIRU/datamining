@@ -16,7 +16,7 @@ n_trt <- 4 # number of treatment groups
 ```
 
 # Data
-#### Naïve (healthy and untreated), Vehicle (sick and treated with inactive part of the drug) ,Treatment 1(sick and treated with active drug one dose suspended in vehicle) and Treatment 2(sick and treated with active drug two dose suspended in vehicle)
+#### Naïve (healthy and untreated), Vehicle (sick and treated with inactive part of the drug) ,Treatment 1(sick and treated with active drug one dose suspended in vehicle) and Treatment 2(sick and treated with active drug two dose suspended in vehicle).
 ```{r data_sim}
 dt1 <- data.table(Groups = rep(c("Naive",
                                  "Vehicle",
