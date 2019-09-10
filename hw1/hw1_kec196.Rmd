@@ -1,0 +1,125 @@
+---
+title: A Simulated Study on the Effect of Compound TRTX001 in Treating Inflammation in Mice
+author: "Kenneth E. Cherasia"
+date: "September 10, 2019"
+output:
+  html_document:
+    code_folding: hide
+    code_download: yes
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    theme: readable
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE}
+#----- Packages -----#
+# Tidyverse
+library(tidyverse)
+# Tables
+library(data.table)
+library(DT)
+```
+
+```{r param}
+# Set seed for reproducibility
+set.seed(123)
+
+# Parameters
+N_per_group <- 15
+N_group <- 4
+
+N_total <- N_per_group * N_group
+```
+
+<br>
+
+# Study Description
+
+This is a simulated study concerning the effect of compound TRTX001 in treating inflammation in injured mice. A total of `r N_total` healthy mice were randomly selected for inclusion in this study from a population of mice with similar physical characteristics, e.g. age and weight. The mice were randomly assigned, in equal proportion, to the following groups: Naive, Vehicle, and two treatment groups of doses 5 and 10 mcg/mL of TRTX001 solution. The Naive group consisted of healthy mice without intervention. The Vehicle group consisted of mice that were first injured, then injected with a solution containing all inactive ingredients in the treatment solution. The Treatment groups consisted of mice that were first injured, then injected with a treatment solution of the appropriate dosage (including the inactive ingredients). The extent of inflammation was rated on an ordinal integer scale of 0-5 at four hours after injection based on pre-established criteria, with a higher score indicating more inflammation.
+
+<br>
+
+# Data Simulation
+
+We will assume that the inflammation scores are distributed according to a multinomial distribution with probability vector depending on group / treatment dosage. The probabilities were chosen so that we expect the Naive group to have the lowest inflammation scores, the Vehicle group to have the highest inflammation scores, and the Treatment groups to fall somewhere in-between with higher (safe) dosage generally corresponding to lower inflammation scores [note: this method was chosen for ease-of-implementation, and it would be better to consider something like a formal dose-response model]. The data table below provides the inflammation score for each test subject, identified by a unique ID number.
+
+```{r sim}
+dt <- data.table()
+
+dt$ID <- seq_len(N_total)
+dt$Group <- rep(
+  c("Naive","Vehicle",paste0("TRTX_",c(5,10))),
+  each = N_per_group
+)
+dt$Score <- c(
+  sample(x = 0:5, size = N_per_group, replace = TRUE, prob = c(0.5,0.3,0.1,0.06,0.03,0.01)),
+  sample(x = 0:5, size = N_per_group, replace = TRUE, prob = c(0.01,0.02,0.07,0.2,0.4,0.3)),
+  sample(x = 0:5, size = N_per_group, replace = TRUE, prob = c(0.03,0.07,0.2,0.2,0.3,0.2)),
+  sample(x = 0:5, size = N_per_group, replace = TRUE, prob = c(0.1,0.3,0.3,0.15,0.1,0.05))
+)
+
+dt$Group <- dt$Group %>% factor(levels = c("Naive","Vehicle","TRTX_5","TRTX_10"))
+dt$Score <- dt$Score %>% factor(levels = 0:5)
+
+dt <- dt %>% as.data.frame()
+
+dt2 <- dt %>%
+  group_by(Group,Score) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  complete(Group, Score, fill = list(Count = 0))
+
+ 
+datatable(
+  dt,
+  rownames = FALSE,
+  filter = "top",
+  options = list(
+    columnDefs = list(
+      list(className = 'dt-center', targets = "_all")
+    ),
+    pageLength = 10,
+    scrollX = TRUE,
+    searching = TRUE
+  )
+)
+```
+
+<br>
+
+# Data Visualization
+
+We present barplots showcasing the number of observations corresponding to each value on the inflammation score scale of 0-5 by treatment group. The bar plots are (approximately) in agreement with the parameters chosen during simulation. The inflammation score ranking appears consistent with Naive < TRTX_10 < TRTX_5 < Vehicle, though the 10 mcg/mL treatment appears much more effective. Of course, formal statistical tests should be conducted.
+
+```{r viz}
+p1 <-
+  ggplot(
+    data = dt2,
+    aes(x = Score, y = Count, fill = Group)
+  ) +
+  geom_bar(
+    stat = "identity",
+    position = "dodge",
+    color = "black"
+  ) +
+  facet_wrap(
+    vars(Group)
+  ) +
+  labs(
+    title = "Barplots of Inflammation Score by Treatment Group"
+  ) +
+  theme(
+    panel.spacing.y = unit(4, "mm")
+  )
+
+p1
+```
+
+# Future Work
+Here are some things to consider to make the situation more interesting:
+
+* Test an additional drug, possibly with multiple doses.
+* Use a compound inflammation score (also consider individual scores separately).
+* Have multiple researchers rate inflammation scores (observation is somewhat subjective).
+* Use a more complicated sampling method.
