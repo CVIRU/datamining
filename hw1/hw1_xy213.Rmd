@@ -1,0 +1,65 @@
+---
+title: "R Notebook"
+output: 
+  html_notebook:
+    toc:true
+---
+
+```{r setup}
+require(data.table)
+require(ggplot2)
+require(plotly)
+require(DT)
+
+N <- 6 # number of animals per group
+n_trt <- 4 # number of treatment groups
+```
+
+# Data
+```{r data_sim}
+# Naive: Unsick
+# Vehicle: Sick
+# Treatment_1: Treatment stage 1
+# Treatment_2: Treatment stage 2
+dt1 <- data.table(Groups = rep(c("Naive",
+                                 "Vehicle",
+                                 "Treatment_1",
+                                 "Treatment_2"),
+                               each = N),
+                  ID = paste0("ID",
+                              1:(N*n_trt)))
+datatable(dt1,
+          rownames = FALSE)
+```
+
+# Add scores
+```{r add_vars}
+# Naive: Lowest score
+# Vehicle: Highest score
+# Treatment_1:  Between Naive and Vehicle
+# Treatment_2:  Between Naive and Vehicle but lower than Treatment_1
+dt1$Score <- c(
+  rnorm(N, 0, 0.5),
+  rnorm(N, 3, 0.5),
+  rnorm(N, 2, 0.5),
+  rnorm(N, 1, 0.5)
+)
+  
+
+
+datatable(dt1)
+```
+
+```{r plot}
+p1 <- ggplot(data = dt1,
+             aes(x = Groups,
+                 y = Score,
+                 fill = ID)) +
+  geom_point(shape = 21,
+             size = 3,
+             position = position_dodge(0.3))
+print(p1)
+
+ggplotly(p1)
+```
+
