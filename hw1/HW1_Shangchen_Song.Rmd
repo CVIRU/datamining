@@ -1,0 +1,69 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: toc:true
+---
+
+```{r setup}
+require(data.table)
+require(ggplot2)
+require(plotly)
+require(DT)
+
+N <- 15 # number of animals per group
+n_trt <- 4 # number of treatment groups
+```
+
+# Data
+```{r data_sim}
+dt1 <- data.table(Groups = rep(c("Naive",
+                                 "Vehicle",
+                                 "Treatemt1", "Treatemt2"),
+                               each = N),
+                  ID = paste0("ID",
+                              1:(N*n_trt)))
+datatable(dt1,
+          rownames = FALSE)
+```
+
+# Add scores
+```{r add_vars}
+dt1$Score <- rnorm(N*n_trt, 0, 1)
+datatable(dt1)
+```
+
+```{r plot}
+p1 <- ggplot(data = dt1,
+             aes(x = Groups,
+                 y = Score,
+                 fill = ID)) +
+  geom_point(shape = 22,
+             size = 4,
+             position = position_dodge(0.3))
+
+ggplotly(p1)
+```
+
+
+```{r}
+p3 <- ggplot(data = dt1, aes(x=Score)) + geom_density(color='red')
+
+ggplotly(p3)
+
+```
+
+
+
+```{r}
+x.points <- seq(from = -3, to = 3, length.out = 1000)
+y.points <- dnorm(seq(from = -3, to = 3, length.out = 1000))
+p2 <- ggplot(data = data.frame(x.points,y.points),
+             aes(x = x.points,
+                 y = y.points)) + geom_line(color='blue')
+
+ggplotly(p2)
+
+```
+
