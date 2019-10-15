@@ -1,0 +1,80 @@
+---
+title: "BinPlot"
+author: "Minghan Huang"
+date: "9/16/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown and binplot
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Foe this document, I demonstrated some examples of function binplot(),
+
+Firstly, the binplot():
+```{r binplot()}
+binplot <- function(x,y,nr=20,nc=20, scale="raw") {
+zx = c(1:nr,rep(1,nc),1+trunc( nr*(x- min(x))/(max(x)-min(x)) ))
+zx[zx>nr] = nr
+zy = c(rep(1,nr),1:nc,1+trunc( nc*(y- min(y))/(max(y)-min(y)) ))
+zy[zy>nc] = nc
+z = table(zx,zy); z[,1]=z[,1]-1; z[1,]=z[1,]-1;
+if (scale=="l") z= log(1+z)
+image(z=t(z),x=seq(length=nr+1,from=min(x),to=max(x)),
+y= seq(length=nc+1,from=min(y),to=max(y)),
+xlab="",ylab="", col=topo.colors(100))
+}
+
+```
+
+## Basic Usage
+
+You can use binplot() to make scatter plot in a 'bin' way, for example:
+
+```{r Basic Usage}
+x = rnorm(10000) ; y = rnorm(10000)
+plot(x,y)
+binplot(x,y,10,10)
+```
+
+## Advanced Usage by changing the number of observations
+
+The plot is becoming more and more clear when the number of bin is increasing.
+
+```{r Advanced Usage}
+binplot(x,y,50,50)
+binplot(x,y,100,100)
+```
+
+## Advanced Usage by performing 'log' transformation
+
+The plot is enlarged after log transformation.
+
+```{r Advanced Usage3}
+binplot(x,y,100,100,'l')
+binplot(x,y,500,500,'l')
+```
+
+## Finding something invisible
+
+The relationship is hidden in the scatter plot, however, with binplot() we can find those invisible
+relationship since the number of dots in a bin can be represented by color
+
+```{r More usage}
+ux = rnorm(5000)/3
+uy = ux^2 -0.5
+par(mar=c(4,4,1,1))
+plot(x=c(y,uy),y=c(x,ux),pch=20,col=3,xlab="X",ylab="Y",cex=0.7)
+binplot(c(y,uy)+20,c(x,ux),100,100)
+binplot(c(y,uy)+20,c(x,ux),100,100,"l")
+```
+
+
+
+
